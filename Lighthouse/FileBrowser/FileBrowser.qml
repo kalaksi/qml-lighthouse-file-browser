@@ -27,6 +27,7 @@ Item {
     property var _currentFileListView: null
 
     signal directoryExpanded(string path, bool is_cached)
+    signal fileSelected(string path, int row)
 
     onColumnHeadersChanged: {
         if (root.columnHeaders.length > root._maxColumns) {
@@ -159,12 +160,21 @@ Item {
                 rootPath: root.selectedDirectory
                 hideDirectories: true
                 enableDirectoryNavigation: false
+                enableSelection: true
                 columnWidthProvider: function(column, totalWidth) {
                     return root._getColumnWidth(column, totalWidth, false)
                 }
 
                 onDirectoryExpanded: function(path, is_cached) {
                     root.directoryExpanded(path, is_cached)
+                }
+
+                onFileSelected: function(path, row) {
+                    root.fileSelected(path, row)
+                }
+
+                onRootPathChanged: {
+                    fileListView.selectedRow = -1
                 }
 
                 Component.onCompleted: {

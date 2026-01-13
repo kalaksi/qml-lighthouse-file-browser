@@ -16,14 +16,16 @@ Item {
     property bool hideFiles: false
     property bool hideDirectories: false
     property bool enableDirectoryNavigation: true
+    property bool enableSelection: false
+    property int selectedRow: -1
 
     property var _cache: ({})
     property var _expandedDirs: ({})
     property int _maxColumns: 8
 
-
     signal directoryExpanded(string path, bool is_cached)
     signal directorySelected(string path)
+    signal fileSelected(string path, int row)
 
     onRootPathChanged: refreshView()
 
@@ -84,10 +86,23 @@ Item {
                 return ""
             }
 
+            selected: root.enableSelection && root.selectedRow === viewDelegate.row
+
+            property bool isSelectedOrHighlighted: viewDelegate.highlighted || viewDelegate.selected
+
             onClicked: {
                 if (viewDelegate.fileType === "d") {
                     root.toggleDirectory(viewDelegate.fullPath)
                     root.directorySelected(viewDelegate.fullPath)
+                }
+                else if (root.enableSelection) {
+                    if (root.selectedRow === viewDelegate.row) {
+                        root.selectedRow = -1
+                    }
+                    else {
+                        root.selectedRow = viewDelegate.row
+                        root.fileSelected(viewDelegate.fullPath, viewDelegate.row)
+                    }
                 }
             }
 
@@ -116,7 +131,7 @@ Item {
                             width: root.arrowWidth
                             visible: viewDelegate.fileType === "d" && root.enableDirectoryNavigation
                             text: root._expandedDirs[viewDelegate.fullPath] === true ? "▼" : "▶"
-                            color: viewDelegate.highlighted ? viewDelegate.palette.highlightedText : viewDelegate.palette.buttonText
+                            color: viewDelegate.isSelectedOrHighlighted ? viewDelegate.palette.highlightedText : viewDelegate.palette.buttonText
                             verticalAlignment: Text.AlignVCenter
                         }
                     }
@@ -125,7 +140,7 @@ Item {
                         width: nameColumn.width - arrowIndentArea.width - nameColumn.spacing
                         text: viewDelegate.model.display
                         elide: Text.ElideRight
-                        color: viewDelegate.highlighted ? viewDelegate.palette.highlightedText : viewDelegate.palette.buttonText
+                        color: viewDelegate.isSelectedOrHighlighted ? viewDelegate.palette.highlightedText : viewDelegate.palette.buttonText
                         verticalAlignment: Text.AlignVCenter
                     }
                 }
@@ -135,7 +150,7 @@ Item {
                     anchors.fill: parent
                     text: viewDelegate.model.display
                     elide: Text.ElideRight
-                    color: viewDelegate.highlighted ? viewDelegate.palette.highlightedText : viewDelegate.palette.buttonText
+                    color: viewDelegate.isSelectedOrHighlighted ? viewDelegate.palette.highlightedText : viewDelegate.palette.buttonText
                 }
             }
         }
