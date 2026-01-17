@@ -1,4 +1,4 @@
-# Lighthouse.FileBrowser
+# Lighthouse QML components: File browser
 
 A pure QML file browser component.  
 This is part of the Lighthouse QML components used in [Lightkeeper](https://github.com/kalaksi/lightkeeper).
